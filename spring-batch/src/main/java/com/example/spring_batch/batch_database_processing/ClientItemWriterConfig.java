@@ -20,7 +20,7 @@ public class ClientItemWriterConfig {
             JdbcBatchItemWriter<Client> writer = new JdbcBatchItemWriterBuilder<Client>()
                     .dataSource(targetDataSource)
                     .sql("""
-                            INSERT INTO client (id, nom, email, age)
+                            INSERT INTO clients (id, nom, email, age)
                             VALUES (:id, :nom, :email, :age)
                             ON CONFLICT (id)
                             DO UPDATE SET 

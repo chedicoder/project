@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableJpaRepositories(
     entityManagerFactoryRef = "secondEntityManagerFactoryBean",
-    basePackages = "com.example.spring_batch.target.entities", // package de tes entités target
+    basePackages = "com.example.spring_batch.repository_ds2", // package de tes entités target
     transactionManagerRef = "secondTransactionManager"
 )
 public class DataSource2Config {
@@ -44,7 +44,7 @@ public class DataSource2Config {
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
         LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
         bean.setDataSource(dataSource());
-        bean.setPackagesToScan("com.example.spring_batch.target.entities");
+        bean.setPackagesToScan("com.example.spring_batch.entities");
 
         JpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
         bean.setJpaVendorAdapter(adapter);

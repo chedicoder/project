@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableJpaRepositories(
     entityManagerFactoryRef = "firstEntityManagerFactoryBean", // à changer
-    basePackages = "com.example.spring_batch.entities", // à changer
+    basePackages = "com.example.spring_batch.repository_ds1", // à changer
     transactionManagerRef = "firstTransactionManager" // à changer
 )
 public class DataSouce1Config  // à changer

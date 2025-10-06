@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+// GET http://localhost:8080/load1?fileName=<path to csv file>.csv
+// Controller pour lire depuis un fichier CSV et insérer dans une base de données
+
 @RestController
-@RequestMapping("/load")
-public class LoadController {
+@RequestMapping("/load1")
+public class LoadController1 {
 
     @Autowired
     private JobLauncher jobLauncher;

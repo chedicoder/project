@@ -10,6 +10,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,19 +28,18 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ImportClientBatchConfig {
 
     private final JobRepository jobRepository;
-    private final PlatformTransactionManager transactionManager;
 
     public ImportClientBatchConfig(JobRepository jobRepository,
                                    PlatformTransactionManager transactionManager) {
         this.jobRepository = jobRepository;
-        this.transactionManager = transactionManager;
     }
 
 // Step pour traiter la BDD: On appelle les ItemReader, ItemProcessor, ItemWriter crées 
 @Bean    
 public Step importClientStep(ItemReader<Client> reader,
                              ItemProcessor<Client, Client> processor,
-                             ItemWriter<Client> writer) {
+                             ItemWriter<Client> writer,
+                             @Qualifier("firstTransactionManager") PlatformTransactionManager transactionManager) {
         return new StepBuilder("importClientStep", jobRepository)
                 .<Client, Client>chunk(10, transactionManager) // taille du chunk
                 .reader(reader)
@@ -50,7 +50,7 @@ public Step importClientStep(ItemReader<Client> reader,
 
 // Step qui appelle le Tasklet deleteMissingClientsIDs
     @Bean
-    public Step deleteMissingClientsStep(Tasklet deleteMissingClientsTasklet) {
+    public Step deleteMissingClientsStep(Tasklet deleteMissingClientsTasklet,@Qualifier("secondTransactionManager") PlatformTransactionManager transactionManager) {
     return new StepBuilder("deleteMissingClientsStep", jobRepository)
             .tasklet(deleteMissingClientsTasklet, transactionManager) // <- ici on passe le TransactionManager
             .build();

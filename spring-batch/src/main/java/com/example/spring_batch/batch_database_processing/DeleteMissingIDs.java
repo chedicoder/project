@@ -27,17 +27,17 @@ public class DeleteMissingIDs {
             NamedParameterJdbcTemplate sourceJdbc = new NamedParameterJdbcTemplate(sourceDataSource);
 
             // Récupérer tous les IDs existants dans la source (référence)
-            var sourceIds = sourceJdbc.queryForList("SELECT id FROM client",Collections.emptyMap(), Long.class);
+            var sourceIds = sourceJdbc.queryForList("SELECT id FROM clients",Collections.emptyMap(), Long.class);
 
             if (!sourceIds.isEmpty()) {
                 // Supprimer dans la target tous les clients dont l'ID n'existe plus dans la source
                 targetJdbc.update(
-                        "DELETE FROM client WHERE id NOT IN (:ids)",
+                        "DELETE FROM clients WHERE id NOT IN (:ids)",
                         Collections.singletonMap("ids", sourceIds)
                 );
             } else {
                 // Si la source est vide, supprimer tous les clients dans la target
-                targetJdbc.update("DELETE FROM client", Collections.emptyMap());
+                targetJdbc.update("DELETE FROM clients", Collections.emptyMap());
             }
 
             return RepeatStatus.FINISHED;
