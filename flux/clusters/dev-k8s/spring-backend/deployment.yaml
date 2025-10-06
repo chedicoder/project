@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring  
+  namespace: my-application   
+spec:
+  replicas: 1             
+  selector:
+    matchLabels:
+      app: backend      
+  template:
+    metadata:
+      labels:
+        app: backend    
+    spec:
+      containers:
+      - image: chedi1/spring:v1.0.0
+        imagePullPolicy: Always 
+        name: spring                           
+        env:
+        - name: spring.datasource.url
+          value: "jdbc:postgresql://postgres.postgres.svc.cluster.local:5432/chadi-db"
+        - name: spring.datasource.username
+          value: "postgres"
+        - name: spring.datasource.password
+          value: "123456789"
+        - name: spring.security.oauth2.resourceserver.jwt.issuer-uri
+          value: "http://keycloak.keycloak.svc.cluster.local/realms/chedi_realm"
+        - name: jwt.auth.converter.resource-id
+          value: "service-client"  
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - mountPath: /log
+          name: log-volume 
+      volumes:
+      - name: log-volume
+        hostPath:
+          path: /var/log/webapp
+          type: DirectoryOrCreate       

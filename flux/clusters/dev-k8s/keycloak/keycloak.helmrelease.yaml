@@ -1,0 +1,56 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  driftDetection:
+    mode: enabled
+  interval: 1m
+  chartRef:
+    kind: OCIRepository
+    name: bitnami
+    namespace: flux-system
+  releaseName: keycloak
+  install:
+    createNamespace: true
+  targetNamespace: keycloak 
+  values:
+    auth:
+      adminUser: admin
+      adminPassword: admin
+    keycloak:
+      extraEnvVars:
+        - name: KEYCLOAK_LOG_LEVEL
+          value: DEBUG
+      persistence:
+        enabled: true
+        existingClaim: keycloak-pvc
+
+    ingress:
+      enabled: true
+      hostname: keycloak.keycloak.svc.cluster.local
+      ingressClassName: nginx
+      path: /
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      tls: false
+
+    postgresql:
+      enabled: true
+      auth:
+        username: bn_keycloak  
+        password: bn_keycloak
+        database: bitnami_keycloak
+    service:
+      type: NodePort
+      nodePorts:
+        http: 30080
+        
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"

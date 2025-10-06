@@ -1,0 +1,8 @@
+# we must install the helm release of elastic operator before installing the elasticsearch, agents and kibana
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+- prometheus.helmrelease.yaml
+- prometheus.helmrepository.yaml

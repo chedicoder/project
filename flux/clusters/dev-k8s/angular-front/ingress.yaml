@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: angular-ingress
+  namespace: my-application
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: sim.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: angular-service
+            port:
+              number: 80
