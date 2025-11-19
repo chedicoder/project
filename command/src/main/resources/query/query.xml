@@ -6,12 +6,4 @@
         SELECT * FROM DIRECTORY_NUMBER WHERE NAME = #NAME
     </entry>
 
-    <!-- <entry key="persons.find.name">
-        <![CDATA[
-
-            (SELECT * FROM DIRECTORY_NUMBER WHERE NAME = #NAME)
-	    
-        ]]>
-    </entry> -->
-
 </properties>

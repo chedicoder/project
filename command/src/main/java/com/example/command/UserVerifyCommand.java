@@ -2,7 +2,7 @@ package com.example.command;
 
 import java.util.Map;
 
-public class UserVerifyService {
+public class UserVerifyCommand {
 
     private final UserDao dao = new UserDao();
 

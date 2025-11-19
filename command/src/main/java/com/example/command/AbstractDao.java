@@ -1,6 +1,4 @@
-// Charge le XML des requêtes dans Properties via loadFromXML.
-
-// queryProperties.getProperty("persons.find.name") permet de récupérer la requête
+// Charge le fichier XML contenant les requêtes via loadFromXML.
 
 package com.example.command;
 

@@ -1,6 +1,3 @@
-// Permet de prendre les paramétres de la requête SQL avant exécution
-// Permet de changer les variables et personnaliser la requête SQL avant exécution
-
 package com.example.command;
 
 import java.util.HashMap;
@@ -25,13 +22,13 @@ public class DaoSupport {
         return this;
     }
 
-    public String count() {
-        // ici juste pour tester le remplacement de param
-        String q = query;
+    public String read() {
+        String q = query; // copie de la requête
+
         for (String k : params.keySet()) {
             q = q.replace("#" + k, params.get(k).toString());
         }
+
         return q;
     }
 }
-
