@@ -3,18 +3,21 @@ Ils doivent aussi être les mêmes que dans le fichier WebServiceConfig.java (da
 Ils définisse le package des classes générées à partir de ce fichier XSD 
 Ils regroupent les fichiers XSD dans des namespaces 
 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:tns="http://spring.io/guides/gs-producing-web-service"
+           targetNamespace="http://spring.io/guides/gs-producing-web-service" 
+           elementFormDefault="qualified">
 
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/gs-producing-web-service"
-           targetNamespace="http://spring.io/guides/gs-producing-web-service" elementFormDefault="qualified">
-
+    <!-- Requête pour récupérer un pays par ID -->
     <xs:element name="getCountryRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="name" type="xs:string"/>
+                <xs:element name="id" type="xs:long"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
+    <!-- Réponse contenant le pays -->
     <xs:element name="getCountryResponse">
         <xs:complexType>
             <xs:sequence>
@@ -23,8 +26,10 @@ Ils regroupent les fichiers XSD dans des namespaces
         </xs:complexType>
     </xs:element>
 
+    <!-- Type complexe Country -->
     <xs:complexType name="country">
         <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="population" type="xs:int"/>
             <xs:element name="capital" type="xs:string"/>
@@ -32,7 +37,7 @@ Ils regroupent les fichiers XSD dans des namespaces
         </xs:sequence>
     </xs:complexType>
 
-<!-- enumration currency -->
+    <!-- Enumération Currency -->
     <xs:simpleType name="currency">
         <xs:restriction base="xs:string">
             <xs:enumeration value="GBP"/>
