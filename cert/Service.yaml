@@ -1,0 +1,15 @@
+# ClusterIP
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cert-client-service        # Nom du service
+spec:
+  selector:
+    app: app         # Étiquette pour séléctionner les pods d'un déploiement
+  ports:
+  - protocol: TCP
+    port: 80                 # Port extérieur forwarded du service
+    targetPort: 8080         # Port intérieurs des pods séléctionnés
+  type: ClusterIP            # Type de service
+

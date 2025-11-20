@@ -1,13 +1,13 @@
-package com.example.cert_client;
+package com.example.cert;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CertClientApplication {
+public class CertApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CertClientApplication.class, args);
+		SpringApplication.run(CertApplication.class, args);
 	}
 
 }
