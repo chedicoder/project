@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular     
+  namespace: my-application
+spec:
+  replicas: 1             
+  selector:
+    matchLabels:
+      app: frontend      
+  template:
+    metadata:
+      labels:
+        app: frontend    
+    spec:
+      containers:
+      - image: chedi1/angular:v1.0.0
+        imagePullPolicy: Always
+        name: angular                           
+        env:
+        - name: var1
+          value: "value1"
+        ports:
+        - containerPort: 80    

@@ -1,0 +1,46 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-release
+  namespace: prometheus-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    prometheus:
+      service:
+        type: NodePort
+      # ingress:
+      #   enabled: true
+      #   ingressClassName: nginx
+      #   annotations:
+      #     kubernetes.io/ingress.class: nginx
+      #     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      #   hosts:
+      #     - prometheus.com
+      #   path: /   
+    grafana:
+      service:
+        type: NodePort
+      # ingress:
+      #   enabled: true
+      #   ingressClassName: nginx
+      #   annotations:
+      #     kubernetes.io/ingress.class: nginx
+      #     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      #   hosts:
+      #     - grafana.com
+      #   path: /
+    alertmanager:
+      service:
+        type: NodePort

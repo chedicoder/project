@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="notification-001" author="makhkhas.hamza">
+        <comment>Create DATA ODEL</comment>
+        <sqlFile path="./liquibase/db/changelog/Notification/20250625_DDL_ENABLERDB_DATA_MODEL_NOTIFICATION-1.sql"
+                 splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    
+     <changeSet id="notification-002" author="makhkhas.hamza">
+        <comment>Create DATA ODEL</comment>
+        <sqlFile path="./liquibase/db/changelog/Notification/20250625_DDL_ENABLERDB_DATA_MODEL_NOTIFICATION-2.sql"
+                 splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="notification-003" author="makhkhas.hamza">
+        <comment>Create DATA ODEL</comment>
+        <sqlFile path="./liquibase/db/changelog/Notification/20250625_DDL_ENABLERDB_DATA_MODEL_NOTIFICATION-3.sql"
+                 splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="notification-004" author="makhkhas.hamza">
+        <comment>Create DATA ODEL</comment>
+        <sqlFile path="./liquibase/db/changelog/Notification/20250625_DDL_ENABLERDB_DATA_MODEL_NOTIFICATION-4.sql"
+                 splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+ 
+    <changeSet id="notification-005" author="elhousseine.benhassoun">
+        <comment>Create DATA ODEL</comment>
+        <sqlFile path="./liquibase/db/changelog/Notification/20250625_DDL_ENABLERDB_DATA_MODEL_NOTIFICATION-5.sql"
+                 splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+
+
+</databaseChangeLog>

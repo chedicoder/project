@@ -1,0 +1,80 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-customer-connector
+  namespace: msic-app
+spec:
+  ttlSecondsAfterFinished: 30000
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: delete-previous-job
+          image: registry.devtool.iamdg.net.ma/airgap/bitnami/kubectl:1.29.2-debian-12-r3
+          imagePullPolicy: Always
+          env:
+            - name: K8S_KUBE_CONFIG
+              value: "8787"
+
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -euo pipefail
+
+              echo "${K8S_KUBE_CONFIG}" > kubeconfig
+              chmod 600 kubeconfig
+              export KUBECONFIG=kubeconfig
+              kubectl delete -n msic-app job deploy-customer-connector --cascade=background
+
+      containers:
+        - name: deploy-customer-connector
+          image: df/apps/msic/sd:sd
+          imagePullPolicy: Always
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+
+              echo "🔐 Preparing SSH access"
+              mkdir -p ~/.ssh && chmod 700 ~/.ssh
+              ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""            
+              EB_PASSWORD="ebint\$\$24"
+
+              sshpass -p $EB_PASSWORD ssh-copy-id -o StrictHostKeyChecking=no "$EB_USER@$EB_IP" \
+                || echo "SSH key may already exist"
+
+              echo "📦 Deploying JAR from $PATH_TO_JAR to $BSCS_JAR/cms_plugin"
+              scp -v "$PATH_TO_JAR" "$EB_USER@$EB_IP:$BSCS_JAR/cms_plugin" \
+                && echo "✅ JAR copied" \
+                || { echo "❌ Failed to copy JAR"; exit 1; }
+
+              echo "📂 Copying CDF folder..."
+              scp -v -r "$PATH_TO_XML" "$EB_USER@$EB_IP:$BSCS_RESOURCE/cms/cdf/" \
+                && echo "✅ CDF copied" \
+                || { echo "❌ Failed to copy CDF"; exit 1; }
+
+              echo "📦 Copying SOI tmp → $TMP_SOI"
+              ssh "$EB_USER@$EB_IP" "mkdir -p $TMP_SOI"
+              scp -v "$ARTIFACT_SOI" "$EB_USER@$EB_IP:$TMP_SOI" \
+                && echo "✅ SOI copied" \
+                || { echo '❌ Failed to copy SOI'; exit 1; }
+
+              echo "📦 Copying NKRegistry tmp → $TMP_NKRegistry"
+              ssh "$EB_USER@$EB_IP" "mkdir -p $TMP_NKRegistry"
+              scp -v "$ARTIFACT_NKRegistry" "$EB_USER@$EB_IP:$TMP_NKRegistry" \
+                && echo '✅ NKRegistry copied' \
+                || { echo '❌ Failed to copy NKRegistry'; exit 1; }
+
+              echo "🚀 Cloning ansible templates"
+              git -c http.sslVerify=false clone "$BASE_REPO_URL/devsecops/ansible-templates.git" ansible-templates
+
+              cd ansible-templates/CMS_Plugin
+              sed -i "s|^\(\s*eb_base_path:\s*\).*|\1${EB_BASE}|" roles/Deploy_CMS_to_EB/vars/main.yml
+
+              echo "🚀 Running Ansible playbook"
+              ansible-playbook -i "$EB_IP," playbooks/Deploy_CMS_to_EB.yml \
+                -e "ansible_user=$EB_USER ansible_become_pass=$EB_PASSWORD"
+
+              echo "🎉 Deployment completed " 
+
+              
+

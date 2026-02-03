@@ -1,0 +1,15 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: openldap-release
+  namespace: openldap  
+spec:
+  chartRef:
+    kind: HelmChart
+    name: helm-openldap
+    namespace: flux-system
+  values:
+    replicas: 1
+    persistence:
+      enabled: true
+      size: 10Gi

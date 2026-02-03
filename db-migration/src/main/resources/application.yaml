@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: tech-enabler-liquibase-service
+  config:
+    import: "optional:configserver:http://config-service:8080"  
+  cloud:
+    config:
+      fail-fast: false
+      profile: k8s
+      insecure-trust-manager: true
+      ssl:
+        skip-ssl-validation: true
+  main:
+    web-application-type: none
+  liquibase:
+    enabled: true
+    change-log: classpath:/liquibase/db/changelog/changelog-master.xml
+
+logging:
+  level:
+    liquibase: DEBUG
+    org.springframework: DEBUG

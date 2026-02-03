@@ -1,0 +1,61 @@
+
+spring:
+  application:
+    name: config-service
+  mvc:
+    contentnegotiation:
+      favor-path-extension: false
+    pathmatch:
+      matching-strategy: path_pattern_parser
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: false
+    config:
+      server:
+        # Config Server bootstraps itself from the backend repo (optional but recommended)
+        bootstrap: true
+        git:
+          uri: https://github.com/chedicoder/config-repo.git
+          username: chedicoder
+          # password: put your token 
+          skip-ssl-validation: ${SPRING_CLOUD_CONFIG_SERVER_GIT_SKIP_SSL_VALIDATION:false}
+          # branch OR tag (DEV can be branch; TST should be tag like 1.0.0-rc1)
+          default-label: ${SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL:main}
+          # Priority: env/<env> overrides common
+          search-paths:
+            - dev
+            - env/${CONFIG_ENV}
+          # Recommended for predictable behavior in K8s
+          clone-on-start: true
+          force-pull: true
+runtime-config:
+  base-url: ${CONFIG_SERVER_BASE_URL:http://config-service:8080}
+
+
+server:
+  ssl:
+    enabled: false
+  port: 8080
+
+# Tmp for prod
+# gitlab:
+#   url: https://gitlab.prdtool.iamdg.net.ma
+#   project:
+#     id: 30
+#   branch: main
+#   token: put your token
+
+github:
+  owner: chedicoder
+  repo: config-repo
+  branch: main  # optionnel, par défaut main
+
+
+scheduler:
+  interval: 10000   # watch every 10 secondes 
+
+hotrefresh:
+  namespace: msic-app
+  port: 8080
+  path: /actuator/refresh

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cert-client          # Nom du déploiement
+spec:
+  replicas: 1                # Nombre de réplicas de pod
+  selector:
+    matchLabels:
+      app: app       # Étiquette de service utilisée pour sélectionner les pods de ce déploiement
+  template:
+    metadata:
+      labels:
+        app: app     # Étiquette de service utilisée pour sélectionner les pods de ce déploiement
+    spec:
+      containers:
+      - image: client:1.0  # Image déployé
+        imagePullPolicy: Never
+        name: cert-client                            # Nom du container
+        ports:
+        - containerPort: 8080                        # Port intérieurs des applications dans les pods
+
+---
+

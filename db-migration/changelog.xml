@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="access-rights-001" author="yassine.gharbaoui">
+        <comment>Customer Connector Access Rights</comment>
+        <sqlFile path="src/main/resources/liquibase/db/changelog/AccessRights/customer-connector-accessRights.sql" splitStatements="false" endDelimiter=";"/>
+    </changeSet>
+
+
+    <changeSet id="access-rights-002" author="yassine.gharbaoui">
+        <comment>Financial Connector Access Rights</comment>
+        <sqlFile path="src/main/resources/liquibase/db/changelog/AccessRights/financial-connector-accessRights.sql"  splitStatements="false" endDelimiter=";" />
+    </changeSet>
+
+        <changeSet id="access-rights-003" author="yassine.gharbaoui">
+            <comment>Portability Connector Access Rights</comment>
+            <sqlFile path="src/main/resources/liquibase/db/changelog/AccessRights/portability-connector-accessRights.sql"  splitStatements="false" endDelimiter=";" />
+        </changeSet>
+
+        <changeSet id="access-rights-004" author="yassine.gharbaoui">
+            <comment>Resource Management Connector Access Rights</comment>
+            <sqlFile path="src/main/resources/liquibase/db/changelog/AccessRights/resource-management-connector-accessRights.sql"  splitStatements="false" endDelimiter=";" />
+        </changeSet>
+
+        <changeSet id="access-rights-005" author="yassine.gharbaoui">
+            <comment>Sales Hierarchy Connector Access Rights</comment>
+            <sqlFile path="src/main/resources/liquibase/db/changelog/AccessRights/sales-hierarchy-connector-accessRights.sql"  splitStatements="false" endDelimiter=";" />
+        </changeSet>
+
+    <changeSet id="access-rights-006" author="yassine.gharbaoui">
+        <comment>Sales Hierarchy Connector Access Rights</comment>
+        <sqlFile path="src/main/resources/liquibase/db/changelog/AccessRights/resource-management-plugin-accessRights.sql"  splitStatements="false" endDelimiter=";" />
+    </changeSet>
+
+
+</databaseChangeLog>

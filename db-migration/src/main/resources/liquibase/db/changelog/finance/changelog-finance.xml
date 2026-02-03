@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="finance-20250625001" author="o.aragrag">
+        <comment>Create user FINANCE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250625001-finance-user.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716001" author="o.aragrag">
+        <comment>Create table GLENTRY</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716001-glentry-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716002" author="o.aragrag">
+        <comment>Create sequence on table GLENTRY</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716002-glentry-sequence.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716003" author="o.aragrag">
+        <comment>Create table ACCOUNT_RECEIVABLE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716003-account_receivable-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716004" author="o.aragrag">
+        <comment>Init ACCOUNT_RECEIVABLE data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716004-account_receivable-data.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716005" author="o.aragrag">
+        <comment>Create table REASON</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716005-reason-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716006" author="o.aragrag">
+        <comment>Create table PAYMENT_MODE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716006-payment_mode-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716007" author="o.aragrag">
+        <comment>Init PAYMENT_MODE data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716007-payment_mode-data.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716008" author="o.aragrag">
+        <comment>Create table PAYMENT</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716008-payment-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716009" author="o.aragrag">
+        <comment>Create sequence on table PAYMENT</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716009-payment-sequence.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716010" author="o.aragrag">
+        <comment>Create table PAYMENT_STATUS</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716010-payment_status-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250716011" author="o.aragrag">
+        <comment>Create sequence on table PAYMENT_STATUS</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250716011-payment_status-sequence.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250717001" author="o.aragrag">
+        <comment>Create table DOCUMENT</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250717001-document-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250717002" author="o.aragrag">
+        <comment>Create sequence on table DOCUMENT</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250717002-document-sequence.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250717003" author="o.aragrag">
+        <comment>Create trigger on table DOCUMENT</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250717003-document-trigger.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20250717004" author="o.aragrag">
+        <comment>Create table PAYMENT_DETAIL</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250717004-payment_detail-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250717005" author="o.aragrag">
+        <comment>Create table DOCUMENT_DETAIL</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250717005-document_detail-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250717006" author="o.aragrag">
+        <comment>Create sequence on table DOCUMENT_DETAIL</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250717006-document_detail-sequence.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250726001" author="o.aragrag">
+        <comment>Create table BANK</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250726001-bank-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250726002" author="o.aragrag">
+        <comment>Init BANK data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250726002-bank-data.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20250726003" author="o.aragrag">
+        <comment>Create table BANK_BRANCH</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250726003-bank_branch-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250726004" author="o.aragrag">
+        <comment>Init BANK_BRANCH data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250726004-bank_branch-data.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20250726005" author="o.aragrag">
+        <comment>Create table TRANSACTION_TYPE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250726005-transaction_type-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250726006" author="o.aragrag">
+        <comment>Init TRANSACTION_TYPE data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250726006-transaction_type-data.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20250812001" author="o.aragrag">
+        <comment>Create table DISPATCH</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250812001-dispatch-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250812002" author="o.aragrag">
+        <comment>Alter table PAYMENT - replace BORDU_NUM by DISPATCH_ID</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250812002-payment-alter_table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250819001" author="o.aragrag">
+        <comment>Alter table PAYMENT - modify USER_ID size</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250819001-payment-alter_table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-202508250001" author="y.gharbaoui" context="resize">
+        <comment>Alter table PAYMENT_STATUS - modify USER_ID size</comment>
+        <modifyDataType schemaName="FINANCE"
+                        tableName="PAYMENT_STATUS"
+                        columnName="USER_ID"
+                        newDataType="VARCHAR2(100)"/>
+    </changeSet>
+
+    <changeSet id="finance-20250925001" author="z.achour">
+        <comment>Create sequence on table DISPATCH</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250925001-dispatch-sequence.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250928001" author="o.aragrag">
+        <comment>Alter table DOCUMENT_DETAIL - add column TAX_CODE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250928001-document_detail-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20250930001" author="o.aragrag">
+        <comment>Init REASON data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20250930001-reason-data.sql" splitStatements="false"/>
+    </changeSet>
+    <changeSet id="finance-20251006002" author="n.zaizi">
+        <comment>Alter table DOCUMENT_DETAIL - add columns PRODUCT_DESC - SAP_CODE - IS_BUNDLED - ITEM_ID - PARENT_ITEM_ID</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251006002-document_detail-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+    <changeSet id="finance-20251014001" author="n.zaizi">
+        <comment>Alter table DOCUMENT - add columns ORDER_INFOS - SHOPPING_CARD_ID</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251014001-document-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+    <changeSet id="finance-20251017001" author="h.bouziane">
+        <comment>Alter table DISPATCH - add fk constraint - DISPATCH - PAYMENT_MODE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251017001-dispatch-alter-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251027001" author="z.achour">
+        <comment>Alter table PAYMENT - add columns</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251027001-payment-alter-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251031001" author="o.aragrag">
+        <comment>Alter table DOCUMENT_DETAIL - modify column GLCODE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251031001-document_detail-alter_table.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251104001" author="h.bouziane">
+        <comment>Insert new rows in TRANSACTION_TYPE</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251104001-transaction_type-data.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251105001" author="z.achour">
+        <comment>Alter table DOCUMENT - add columns : DEALER_NAME - DEALER_ID - SAP_SYNCHED</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251105001-document-table-alter-table.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+    <changeSet id="finance-20251120001" author="n.zaizi">
+        <comment>Create table TRANSACTIONS</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251120001-transactions-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+    <changeSet id="finance-20251120002" author="n.zaizi">
+        <comment>Create table EXTERNAL_PAYMENT_TRANSACTION</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251120002-externalPaymentTransaction-table.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+    <changeSet id="finance-20251123001" author="n.zaizi">
+        <comment>alter table EXTERNAL_PAYMENT_TRANSACTION</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251123001-externalPaymentTransaction-alter-table.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251125001" author="n.zaizi">
+        <comment>CREATE table SHEDLOCK</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251125001-shedlock-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251127001" author="n.zaizi">
+        <comment>alter table EXTERNAL_PAYMENT_TRANSACTION ADD TYPE_TRANSACTION COLUMN</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251127001-externalPaymentTransaction-alter-table.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251204001" author="h.bouziane">
+        <comment>alter table EXTERNAL_PAYMENT_TRANSACTION ADD TYPE_TRANSACTION COLUMN</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251204001-document-add-note-signoff-date.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251204002" author="h.bouziane">
+        <comment>alter table DOCUMENT change BILLING_ACCOUNT_ID COLUMN type</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251204002-document-table-update-billing-account-id-type.sql"
+                 splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251209001" author="h.bouziane">
+        <comment>alter table DOCUMENT add CM_SOURCE COLUMN</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251209001-document-add-cm-source-column.sql" splitStatements="true"
+                 endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251216001" author="y.chahid">
+        <comment>alter table DOCUMENT_DETAIL glcode detail</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251216001-document-detail-alter.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251218001" author="o.aragrag">
+        <comment>Add ACCOUNT_RECEIVABLE data</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251218001-account_receivable-data.sql" splitStatements="false"/>
+    </changeSet>
+
+    <changeSet id="finance-20251218002" author="o.aragrag">
+        <comment>Alter DOCUMENT table - COL DEALER_ID</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251218002-document-alter-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+
+    <changeSet id="finance-20251218003" author="o.aragrag">
+        <comment>Alter PAYMENT table - COL DEALER_ID</comment>
+        <sqlFile path="./liquibase/db/changelog/finance/20251218003-payment-alter-table.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+</databaseChangeLog>

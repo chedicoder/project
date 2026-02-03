@@ -1,0 +1,18 @@
+runtime-config:
+  base-url: https://app.msicdev.iamdg.net.ma/config-service
+  files:
+    federation-manifest:
+      path: /federation-manifest/k8s
+      key: federation.manifest
+    csr-toolbox-ui-config:
+      path: /csr-toolbox-ui-config/k8s
+      key: config.manifest
+    csr-toolbox-ui-permissions:
+      path: /csr-toolbox-ui-permissions/k8s
+      key: permissions.manifest
+    task-ui-permissions:
+      path: /task-ui-permissions/k8s
+      key: permissions.manifest
+    task-ui-config:
+      path: /task-ui-config/k8s
+      key: config.manifest

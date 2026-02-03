@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: tech-enabler-liquibase-service
+  config:
+    import: "optional:configserver:http://config-service:8080"
+  cloud:
+    config:
+      enabled: false
+      fail-fast: false
+      profile: k8s
+      insecure-trust-manager: true
+      ssl:
+        skip-ssl-validation: true
+  main:
+    web-application-type: none
+  liquibase:
+    enabled: true
+    change-log: classpath:/liquibase/db/changelog/changelog-master.xml
+  datasource:
+    username: LIQUIBASE
+    password: SYSADM
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@//10.100.227.179:1521/enablerdb
+
+logging:
+  level:
+    liquibase: DEBUG
+    org.springframework: DEBUG

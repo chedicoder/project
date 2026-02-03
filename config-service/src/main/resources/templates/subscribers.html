@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Hot Refresh Monitoring</title>
+
+    <style>
+        :root{
+            --bg:#f5f7fb; --card:#fff; --border:#e5e7eb; --text:#111827; --muted:#6b7280;
+            --blue-bg:#eff6ff; --blue-text:#1e40af; --blue-bd:#bfdbfe;
+            --green-bg:#ecfdf5; --green-text:#065f46; --green-bd:#a7f3d0;
+            --yellow-bg:#fffbeb; --yellow-text:#92400e; --yellow-bd:#fde68a;
+            --red-bg:#fef2f2; --red-text:#991b1b; --red-bd:#fecaca;
+            --gray-bg:#f3f4f6; --gray-text:#374151; --gray-bd:#e5e7eb;
+        }
+
+        body{
+            font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+            margin:24px; background:var(--bg); color:var(--text);
+        }
+
+        .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+        h1{margin:0 0 6px 0;font-size:22px;}
+        .meta{color:var(--muted);font-size:13px;line-height:1.4;}
+
+        .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+        .badge{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid;}
+        .badge.total{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-bd);}
+
+        .btn{
+            padding:6px 12px;border-radius:10px;border:1px solid var(--border);
+            background:#fff;font-size:13px;text-decoration:none;color:var(--text);
+        }
+        .btn:hover{background:#f3f4f6;}
+
+        .card{
+            margin-top:18px;background:var(--card);border:1px solid var(--border);border-radius:14px;
+            overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.03);
+        }
+
+        .card-header{
+            padding:14px 18px;background:#fafafa;border-bottom:1px solid var(--border);
+            display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+        }
+        .card-header code{
+            background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:8px;font-size:13px;
+        }
+
+        table{width:100%;border-collapse:collapse;}
+        th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:left;font-size:14px;vertical-align:top;}
+        th{
+            background:#fafafa;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+            position:sticky; top:0; z-index:1;
+        }
+        tr:hover td{background:#f9fafb;}
+
+        .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+        .service-badge{
+            padding:4px 10px;border-radius:10px;font-weight:700;font-size:13px;
+            background:var(--green-bg); color:var(--green-text); border:1px solid var(--green-bd);
+            display:inline-block;
+        }
+
+        .pill{
+            padding:3px 8px;border-radius:999px;border:1px solid;display:inline-block;font-size:12px;font-weight:700;
+        }
+        .pill.ok{background:var(--green-bg);color:var(--green-text);border-color:var(--green-bd);}
+        .pill.warn{background:var(--yellow-bg);color:var(--yellow-text);border-color:var(--yellow-bd);}
+        .pill.err{background:var(--red-bg);color:var(--red-text);border-color:var(--red-bd);}
+        .pill.na{background:var(--gray-bg);color:var(--gray-text);border-color:var(--gray-bd);}
+
+        .time-ok{
+            background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-bd);
+            padding:3px 8px;border-radius:8px;font-size:12px;font-weight:700;display:inline-block;
+        }
+        .time-stale{
+            background:var(--yellow-bg);color:var(--yellow-text);border:1px solid var(--yellow-bd);
+            padding:3px 8px;border-radius:8px;font-size:12px;font-weight:700;display:inline-block;
+        }
+
+        .empty{padding:18px;color:var(--muted);}
+        .footer{margin-top:12px;font-size:12px;color:var(--muted);}
+
+        /* JSON block */
+        pre.json{
+            margin:0;
+            padding:10px 12px;
+            background:#0b1020;
+            color:#e5e7eb;
+            border-radius:10px;
+            overflow:auto;
+            max-height:220px;
+            border:1px solid rgba(255,255,255,0.08);
+            white-space:pre-wrap;
+            word-break:break-word;
+        }
+        .json-wrap{min-width:280px; max-width:720px;}
+    </style>
+</head>
+
+<body>
+
+<div class="top">
+    <div>
+        <h1>Hot Refresh Monitoring</h1>
+        <div class="meta">
+            Subscribers registered in memory for hot refresh push.<br/>
+            Server time zone: <b th:text="${zone}">UTC</b>
+        </div>
+    </div>
+
+    <div class="right">
+        <span class="badge total">Total services: <span th:text="${count}">0</span></span>
+        <a class="btn" href="/ui/subscribers">Refresh</a>
+    </div>
+</div>
+
+<div class="card">
+
+    <div class="card-header">
+        <div>
+            Subscribe endpoint:
+            <code class="mono">POST /hot-refresh/subscribe/{serviceName}</code>
+        </div>
+        <div class="meta">
+            Refresh push: <span class="mono">POST /actuator/refresh</span> (JSON body <span class="mono">{}</span>)
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(subscribers)}" class="empty">
+        No subscribers yet.
+    </div>
+
+    <table th:if="${!#lists.isEmpty(subscribers)}">
+        <thead>
+        <tr>
+            <th style="width:60px;">#</th>
+            <th style="width:220px;">Service</th>
+            <th style="width:210px;">Subscribed At</th>
+            <th style="width:220px;">Last Seen</th>
+            <th style="width:120px;">Status</th>
+            <th style="width:210px;">Last Refresh</th>
+            <th>Latest Updates (refresh response)</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="s, stat : ${subscribers}">
+            <td th:text="${stat.count}">1</td>
+
+            <td>
+                <span class="service-badge mono" th:text="${s.serviceName}">customer-service</span>
+            </td>
+
+            <td class="mono" th:text="${s.subscribedAt}">2026-01-02T12:00:00Z</td>
+
+            <td>
+                <!-- stale if lastSeen older than 2 minutes -->
+                <span
+                        th:class="${T(java.time.Duration).between(s.lastSeenAt, T(java.time.Instant).now()).toMinutes() < 2
+            ? 'time-ok mono'
+            : 'time-stale mono'}"
+                        th:text="${s.lastSeenAt}">
+          2026-01-02T12:05:00Z
+        </span>
+            </td>
+
+            <!-- Status pill based on lastRefreshStatus -->
+            <td>
+                <span th:if="${s.lastRefreshStatus == null}" class="pill na">N/A</span>
+
+                <span th:if="${s.lastRefreshStatus != null and s.lastRefreshStatus >= 200 and s.lastRefreshStatus < 300}"
+                      class="pill ok"
+                      th:text="${s.lastRefreshStatus}">200</span>
+
+                <span th:if="${s.lastRefreshStatus != null and s.lastRefreshStatus >= 400 and s.lastRefreshStatus < 500}"
+                      class="pill warn"
+                      th:text="${s.lastRefreshStatus}">401</span>
+
+                <span th:if="${s.lastRefreshStatus != null and (s.lastRefreshStatus == 0 or s.lastRefreshStatus >= 500)}"
+                      class="pill err"
+                      th:text="${s.lastRefreshStatus}">500</span>
+            </td>
+
+            <td class="mono" th:text="${s.lastRefreshAt != null ? s.lastRefreshAt : '-'}">-</td>
+
+            <td class="json-wrap">
+        <pre class="json mono"
+             th:text="${s.lastRefreshBody != null && !#strings.isEmpty(s.lastRefreshBody) ? s.lastRefreshBody : '-'}">-</pre>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="footer">
+    Green = active recently • Yellow = stale subscriber • Registry is in-memory (restart clears list)
+</div>
+
+</body>
+</html>

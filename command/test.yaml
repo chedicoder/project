@@ -1,0 +1,419 @@
+image: $SHRD_HARBOR_URL/system/maven:3.8.5-openjdk-17
+
+variables:
+  MAVEN_CLI_OPTS: "-s .ci/ci_settings.xml -B --fail-fast -Dmaven.wagon.http.timeout=5000 -T 2C -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.resolver.transport=wagon"
+  PROJECT_NAME: "$CI_PROJECT_NAME"
+  BASE_REPO_URL: "https://$GITLAB_MSIC_USERNAME:$GITLAB_MSIC_TOKEN@$SHRD_GITLAB_URL/sic-modernization"
+  ENV_NAME: "$CI_COMMIT_REF_NAME"
+  DEVTOOL_HARBOR_URL : "registry.devtool.iamdg.net.ma"  
+# EB_PASSWORD is stored as CI/CD variable
+
+  PATH_TO_JAR: target/$PROJECT_NAME.jar
+
+  PATH_TO_XML: target/generated-sources/deploy/cdf
+  ARTIFACT_SOI: target/generated-sources/deploy/soi/NK_CIL_3_CBIO_2_1_WAL_1.xml
+  ARTIFACT_NKRegistry: target/generated-sources/deploy/plugin/NK_Registry.xml
+  INSTALL_ENV: "$CI_COMMIT_REF_NAME"
+
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      variables:
+        ENV_NAME: "dev"  # Override ENV_NAME to "dev" for main branch
+        EB_USER: ebdev
+        EB_IP: 172.17.47.148
+        EB_PASSWORD: "$EB_PASSWORD_DEV"
+        BSCS_RESOURCE: /home/ebdev/Ericsson_Billing/EBDEV/resource
+        BSCS_JAR: /home/ebdev/Ericsson_Billing/EBDEV/lib/jar
+        TMP_SOI:  /home/ebdev/Ericsson_Billing/EBDEV/resource/cms/soi/tmp-pipeline
+        TMP_NKRegistry:  /home/ebdev/Ericsson_Billing/EBDEV/resource/cms/plugin/tmp-pipeline
+        EB_BASE: /home/ebdev/Ericsson_Billing/EBDEV
+
+    - if: '$CI_COMMIT_REF_NAME == "int"'
+      variables:
+        ENV_NAME: "int"  
+        EB_USER: ebint
+        EB_IP: 172.17.47.144
+        EB_PASSWORD: "$EB_PASSWORD_INT"
+        BSCS_RESOURCE: /home/ebint/Ericsson_Billing/EBINT/resource
+        BSCS_JAR: /home/ebint/Ericsson_Billing/EBINT/lib/jar
+        TMP_SOI:  /home/ebint/Ericsson_Billing/EBINT/resource/cms/soi/tmp-pipeline
+        TMP_NKRegistry:  /home/ebint/Ericsson_Billing/EBINT/resource/cms/plugin/tmp-pipeline
+        EB_BASE: /home/ebint/Ericsson_Billing/EBINT
+
+      when: always
+
+    - if: '$CI_COMMIT_REF_NAME == "tst"'
+      variables:
+        ENV_NAME: "tst"  
+        EB_USER: ebtst
+        EB_IP: 172.17.47.146
+        EB_PASSWORD: "$EB_PASSWORD_TST"
+        BSCS_RESOURCE: /home/ebtst/Ericsson_Billing/EBTST/resource
+        BSCS_JAR: /home/ebtst/Ericsson_Billing/EBTST/lib/jar
+        TMP_SOI:  /home/ebtst/Ericsson_Billing/EBTST/resource/cms/soi/tmp-pipeline
+        TMP_NKRegistry:  /home/ebtst/Ericsson_Billing/EBTST/resource/cms/plugin/tmp-pipeline
+        EB_BASE: /home/ebtst/Ericsson_Billing/EBTST
+
+    - if: '$CI_COMMIT_REF_NAME == "uat"'
+      variables:
+        ENV_NAME: "uat"  
+        EB_USER: ebuat
+        EB_IP: 172.17.47.183
+        EB_PASSWORD: "$EB_PASSWORD_UAT"
+        BSCS_RESOURCE: /home/ebuat/Ericsson_Billing/EBUAT/resource
+        BSCS_JAR: /home/ebuat/Ericsson_Billing/EBUAT/lib/jar
+        TMP_SOI:  /home/ebuat/Ericsson_Billing/EBUAT/resource/cms/soi/tmp-pipeline
+        TMP_NKRegistry:  /home/ebuat/Ericsson_Billing/EBUAT/resource/cms/plugin/tmp-pipeline    
+        EB_BASE: /home/ebuat/Ericsson_Billing/EBUAT
+
+    - if: '$INSTALL_ENV == "dm"'
+      variables:
+        ENV_NAME: "dm"  
+        EB_USER: ebdm
+        EB_IP: 172.17.47.174
+        EB_PASSWORD: "$EB_PASSWORD_DM"
+        BSCS_RESOURCE: /home/ebdm/Ericsson_Billing/EBDM/resource
+        BSCS_JAR: /home/ebdm/Ericsson_Billing/EBDM/lib/jar
+        TMP_SOI:  /home/ebdm/Ericsson_Billing/EBDM/resource/cms/soi/tmp-pipeline
+        TMP_NKRegistry:  /home/ebdm/Ericsson_Billing/EBDM/resource/cms/plugin/tmp-pipeline  
+        EB_BASE: /home/ebdm/Ericsson_Billing/EBDM
+
+
+    - when: always  # Ensures pipeline runs for all other branches
+
+cache:
+  key: ${CI_PROJECT_NAMESPACE}
+  paths:
+    - .m2/repository
+  policy: pull-push
+
+stages:
+  - build
+  - kaniko-devtool
+  - delete
+  - deploy-to-env
+
+include:
+  - project: 'sic-modernization/devsecops/gitlab-ci-templates'
+    file: '/shared/maven/generate-settings.yml'
+    ref: main
+  - project: 'sic-modernization/devsecops/gitlab-ci-templates'
+    file: '/shared/base/set-docker-tag.yml'
+    ref: main
+
+
+
+compile-and-package:
+  stage: build
+  extends: .generate-maven-settings-template
+
+  script:
+    - echo "Maven build - Compilation du projet $PROJECT_NAME"
+    - mvn $MAVEN_CLI_OPTS clean install -DskipTests 
+
+    - mkdir -p export-artifacts
+
+    - |
+      if [ "$PROJECT_NAME" = "commons-connector" ]; then
+        echo "➡️ Export only target/ for commons-connector"
+        cp -r target/ export-artifacts/
+      else
+        echo "➡️ Exporting all generated deploy artifacts"
+        cp -r target/ export-artifacts/
+        cp -r target/generated-sources/deploy/ export-artifacts/ || true
+        cp -r target/generated-sources/deploy/cdf/ export-artifacts/ || true
+        cp -r target/generated-sources/deploy/plugin/ export-artifacts/ || true
+        cp -r target/generated-sources/deploy/soi/ export-artifacts/ || true
+      fi
+
+  artifacts:
+    paths:
+      - export-artifacts/
+    expire_in: 1 week
+
+  timeout: 4h
+
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /^(main|dm|int|uat|tst)$/'
+    - if: '$CI_COMMIT_REF_NAME =~ /^release\/.*$/'
+
+# build and push to harbor devtool
+build-docker-image:
+  stage: kaniko-devtool
+  extends: .before-script-set-tag
+  needs:
+    - job: compile-and-package
+      artifacts: true
+  image:
+    name: $SHRD_HARBOR_URL/system/docker/kaniko-project/executor:v1.14.0-debug
+    entrypoint: [ "" ]
+  script:
+  - |
+    if [ "$PROJECT_NAME" = "commons-connector" ]; then
+      cat <<EOF > Dockerfile
+      FROM registry.devtool.iamdg.net.ma/iac/ansible-cms:1.0.0
+
+      RUN mkdir -p target target/generated-sources/deploy target/generated-sources/deploy/cdf target/generated-sources/deploy/soi target/generated-sources/deploy/plugin
+
+      COPY export-artifacts/target/ target/
+
+      ARG DEVTOOL_HARBOR_URL
+      ARG EB_USER
+      ARG EB_IP
+      ARG PATH_TO_JAR
+      ARG BSCS_JAR
+      ARG BSCS_RESOURCE
+      ARG BASE_REPO_URL
+      ARG EB_BASE
+      ARG EB_PASSWORD
+      ARG PROJECT_NAME
+
+      ENV DEVTOOL_HARBOR_URL=${DEVTOOL_HARBOR_URL} \
+          EB_USER=${EB_USER} \
+          EB_IP=${EB_IP} \
+          PATH_TO_JAR=target/commons-connector-with-dependencies.jar \
+          BSCS_JAR=${BSCS_JAR} \
+          BSCS_RESOURCE=${BSCS_RESOURCE} \
+          BASE_REPO_URL=${BASE_REPO_URL} \
+          EB_BASE=${EB_BASE} \
+          EB_PASSWORD=${EB_PASSWORD} \
+          PROJECT_NAME=${PROJECT_NAME}
+
+      CMD ["ls"]
+      
+    EOF
+    else
+      cat <<EOF > Dockerfile
+      FROM registry.devtool.iamdg.net.ma/iac/ansible-cms:1.0.0
+
+      RUN mkdir -p target target/generated-sources/deploy target/generated-sources/deploy/cdf target/generated-sources/deploy/soi target/generated-sources/deploy/plugin
+
+      COPY export-artifacts/target/ target/
+      COPY export-artifacts/target/generated-sources/deploy/ target/generated-sources/deploy/
+      COPY export-artifacts/target/generated-sources/deploy/cdf target/generated-sources/deploy/cdf/
+      COPY export-artifacts/target/generated-sources/deploy/soi target/generated-sources/deploy/soi/
+      COPY export-artifacts/target/generated-sources/deploy/plugin target/generated-sources/deploy/plugin/
+
+      ARG DEVTOOL_HARBOR_URL
+      ARG EB_USER
+      ARG EB_IP
+      ARG PATH_TO_JAR
+      ARG BSCS_JAR
+      ARG BSCS_RESOURCE
+      ARG TMP_SOI
+      ARG TMP_NKRegistry
+      ARG ARTIFACT_SOI
+      ARG ARTIFACT_NKRegistry
+      ARG BASE_REPO_URL
+      ARG EB_BASE
+      ARG EB_PASSWORD
+      ARG PATH_TO_XML
+      ARG PROJECT_NAME
+
+      ENV DEVTOOL_HARBOR_URL=${DEVTOOL_HARBOR_URL} \
+          EB_USER=${EB_USER} \
+          EB_IP=${EB_IP} \
+          PATH_TO_JAR=${PATH_TO_JAR} \
+          BSCS_JAR=${BSCS_JAR} \
+          BSCS_RESOURCE=${BSCS_RESOURCE} \
+          TMP_SOI=${TMP_SOI} \
+          TMP_NKRegistry=${TMP_NKRegistry} \
+          ARTIFACT_SOI=${ARTIFACT_SOI} \
+          ARTIFACT_NKRegistry=${ARTIFACT_NKRegistry} \
+          BASE_REPO_URL=${BASE_REPO_URL} \
+          EB_BASE=${EB_BASE} \
+          EB_PASSWORD=${EB_PASSWORD} \
+          PATH_TO_XML=${PATH_TO_XML} \
+          PROJECT_NAME=${PROJECT_NAME}
+
+      CMD ["ls"]
+    EOF
+    fi  
+  
+  # Configuration de l'authentification Docker
+  - echo "{\"auths\":{\"$SHRD_HARBOR_URL\":{\"username\":\"$SHRD_HARBOR_USERNAME\",\"password\":\"$SHRD_HARBOR_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  # Construction de l'image avec Kaniko
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --no-push --destination $SHRD_HARBOR_URL/apps/msic/$PROJECT_NAME:$DOCKER_IMAGE_VERSION --tar-path image-devtool.tar --skip-tls-verify-pull --skip-tls-verify-registry $SHRD_HARBOR_URL --skip-tls-verify-registry $DEVTOOL_HARBOR_URL
+
+  artifacts:
+    paths:
+    - image-devtool.tar
+    when: on_success
+  rules:
+    # - if: '$CI_COMMIT_REF_NAME =~ /^feature\/.*$/'
+    - if: '$CI_COMMIT_REF_NAME =~ /^(main|dm|int|uat|tst)$/'
+    - if: '$CI_COMMIT_REF_NAME =~ /^release\/.*$/'
+
+
+push-docker-image:
+  stage: kaniko-devtool
+  extends: .before-script-set-tag
+  image:
+    name: $SHRD_HARBOR_URL/system/docker/kaniko-project/crane:debug
+    entrypoint: [ "" ]
+  script:
+  # Connexion au registre Docker
+  - crane auth login -u $SHRD_HARBOR_USERNAME -p $SHRD_HARBOR_PASSWORD $SHRD_HARBOR_URL --insecure
+  # Pousser l'image générée
+  - crane push image-devtool.tar $SHRD_HARBOR_URL/apps/msic/$PROJECT_NAME:$DOCKER_IMAGE_VERSION --insecure
+  needs:
+    - build-docker-image
+  rules:
+    # - if: '$CI_COMMIT_REF_NAME =~ /^feature\/.*$/'
+    - if: '$CI_COMMIT_REF_NAME =~ /^(main|dm|int|uat|tst)$/'
+    - if: '$CI_COMMIT_REF_NAME =~ /^release\/.*$/'
+
+delete-previous-job:
+  image: $SHRD_HARBOR_URL/airgap/bitnami/kubectl:1.29.2-debian-12-r3
+  stage: delete
+  script:
+    - |
+      if [ "$ENV_NAME" == "dm" ]; then
+        echo "$DM_K8S_KUBE_CONFIG" > kubeconfig
+      elif [ "$ENV_NAME" == "tst" ]; then
+        echo "$TST_K8S_KUBE_CONFIG" > kubeconfig
+      elif [ "$ENV_NAME" == "dev" ]; then
+        echo "$DEV_K8S_KUBE_CONFIG" > kubeconfig
+
+      elif [ "$ENV_NAME" == "uat" ]; then
+        echo "$UAT_K8S_KUBE_CONFIG" > kubeconfig
+
+      elif [ "$ENV_NAME" == "int" ]; then
+        echo "$INT_K8S_KUBE_CONFIG" > kubeconfig
+        
+      else
+        echo "❌ Invalid ENV_NAME: '$ENV_NAME'. Aborting."
+        exit 1
+      fi
+    - chmod 600 kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl delete -n msic-app job deploy-$PROJECT_NAME --cascade=background
+
+  only:
+    - main
+    - tst
+    - dm
+    - uat
+    - int
+  needs:
+    - push-docker-image
+
+deploy-to-dev:
+  stage: deploy-to-env
+  extends: .before-script-set-tag
+  image: $SHRD_HARBOR_URL/system/alpine/git
+  needs:
+    - delete-previous-job
+  script:
+    - echo "🔹 Updating job for $PROJECT_NAME in ENVIRONMENT = dev"
+    - git -c http.sslVerify=false clone https://$DEV_GITLAB_FLUXCD_USERNAME:$DEV_GITLAB_FLUXCD_TOKEN@$SHRD_GITLAB_URL/iac/mt-flux-dev.git updated-repo
+    - cd updated-repo
+    - |
+      sed -i "/containers:/,/ports:/ s|^\(\s*image:\s*\).*|\1${SHRD_HARBOR_URL}/apps/msic/${PROJECT_NAME}:${DOCKER_IMAGE_VERSION}|" clusters/dev-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+
+    - |
+      sed -i "/annotations:/,/containers:/ s|^\(\s*checksum/image:\s*\).*|\1\"${DOCKER_IMAGE_VERSION}\"|" clusters/dev-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+
+    - git config user.email "msic.devsecops@atos.net"
+    - git config user.name "DevSecOps User"
+    - git add clusters/dev-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - git commit -m "update tag to $PROJECT_NAME:$DOCKER_IMAGE_VERSION"
+    - git -c http.sslVerify=false push
+  only:
+    - main
+
+deploy-to-tst:
+  stage: deploy-to-env
+  image: $SHRD_HARBOR_URL/system/alpine/git
+  needs:
+    - delete-previous-job
+  extends: .before-script-set-tag
+  script:
+    - echo "🔹 Updating job for $PROJECT_NAME in ENVIRONMENT = tst"
+    - git -c http.sslVerify=false clone https://$TST_GITLAB_FLUXCD_USERNAME:$TST_GITLAB_FLUXCD_TOKEN@$SHRD_GITLAB_URL/iac/mt-flux-tst.git updated-repo-tst
+    - cd updated-repo-tst
+    - |
+      sed -i "/containers:/,/ports:/ s|^\(\s*image:\s*\).*|\1${SHRD_HARBOR_URL}/apps/msic/${PROJECT_NAME}:${DOCKER_IMAGE_VERSION}|" clusters/tst-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - |
+      sed -i "/annotations:/,/containers:/ s|^\(\s*checksum/image:\s*\).*|\1\"${DOCKER_IMAGE_VERSION}\"|" clusters/tst-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    
+    - git config user.email "msic.devsecops@atos.net"
+    - git config user.name "DevSecOps User"
+    - git add clusters/tst-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - git commit -m "update tag to $PROJECT_NAME:$DOCKER_IMAGE_VERSION"
+    - git -c http.sslVerify=false push origin main
+
+  only:
+    - tst
+
+deploy-to-dm:
+  stage: deploy-to-env
+  extends: .before-script-set-tag
+  needs:
+    - delete-previous-job
+  image: $SHRD_HARBOR_URL/system/alpine/git
+  script:
+    - echo "🔹 Updating job for $PROJECT_NAME in ENVIRONMENT = dm"
+    - git -c http.sslVerify=false clone https://$DM_GITLAB_FLUXCD_USERNAME:$DM_GITLAB_FLUXCD_TOKEN@$SHRD_GITLAB_URL/iac/mt-flux-dm.git updated-repo-dm
+    - cd updated-repo-dm
+    - |
+      sed -i "/containers:/,/ports:/ s|^\(\s*image:\s*\).*|\1${SHRD_HARBOR_URL}/apps/msic/${PROJECT_NAME}:${DOCKER_IMAGE_VERSION}|" clusters/dm-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - |
+      sed -i "/annotations:/,/containers:/ s|^\(\s*checksum/image:\s*\).*|\1\"${DOCKER_IMAGE_VERSION}\"|" clusters/dm-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - git config user.email "msic.devsecops@atos.net"
+    - git config user.name "DevSecOps User"
+    - git add clusters/dm-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - git commit -m "update tag to $PROJECT_NAME:$DOCKER_IMAGE_VERSION"
+    - git -c http.sslVerify=false push origin main
+
+  only:
+    - dm
+
+deploy-to-uat:
+  stage: deploy-to-env
+  extends: .before-script-set-tag
+  needs:
+    - delete-previous-job
+  image: $SHRD_HARBOR_URL/system/alpine/git
+  script:
+    - echo "🔹 Updating job for $PROJECT_NAME in ENVIRONMENT = uat"
+    - git -c http.sslVerify=false clone https://$UAT_GITLAB_FLUXCD_USERNAME:$UAT_GITLAB_FLUXCD_TOKEN@$SHRD_GITLAB_URL/iac/mt-flux-uat.git updated-repo-uat
+    - cd updated-repo-uat
+    - |
+      sed -i "/containers:/,/ports:/ s|^\(\s*image:\s*\).*|\1${SHRD_HARBOR_URL}/apps/msic/${PROJECT_NAME}:${DOCKER_IMAGE_VERSION}|" clusters/uat-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - |
+      sed -i "/annotations:/,/containers:/ s|^\(\s*checksum/image:\s*\).*|\1\"${DOCKER_IMAGE_VERSION}\"|" clusters/uat-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    
+    - git config user.email "msic.devsecops@atos.net"
+    - git config user.name "DevSecOps User"
+    - git add clusters/uat-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - git commit -m "update tag to $PROJECT_NAME:$DOCKER_IMAGE_VERSION"
+    - git -c http.sslVerify=false push origin main
+  only:
+    - uat
+
+deploy-to-int:
+  stage: deploy-to-env
+  extends: .before-script-set-tag
+  needs:
+    - delete-previous-job
+  image: $SHRD_HARBOR_URL/system/alpine/git
+  script:
+    - echo "🔹 Updating job for $PROJECT_NAME in ENVIRONMENT = int"
+    - git -c http.sslVerify=false clone https://$INT_GITLAB_FLUXCD_USERNAME:$INT_GITLAB_FLUXCD_TOKEN@$SHRD_GITLAB_URL/iac/mt-flux-int.git updated-repo-int
+    - cd updated-repo-int
+    - |
+      sed -i "/containers:/,/ports:/ s|^\(\s*image:\s*\).*|\1${SHRD_HARBOR_URL}/apps/msic/${PROJECT_NAME}:${DOCKER_IMAGE_VERSION}|" clusters/int-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - |
+      sed -i "/annotations:/,/containers:/ s|^\(\s*checksum/image:\s*\).*|\1\"${DOCKER_IMAGE_VERSION}\"|" clusters/int-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    
+    - git config user.email "msic.devsecops@atos.net"
+    - git config user.name "DevSecOps User"
+    - git add clusters/int-prime-k8s/msic-app/$PROJECT_NAME/$PROJECT_NAME.job.yaml
+    - git commit -m "update tag to $PROJECT_NAME:$DOCKER_IMAGE_VERSION"
+    - git -c http.sslVerify=false push origin main
+
+  only:
+    - int

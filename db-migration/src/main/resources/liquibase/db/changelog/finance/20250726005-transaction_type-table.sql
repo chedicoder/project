@@ -1,0 +1,41 @@
+CREATE TABLE FINANCE.TRANSACTION_TYPE
+(
+		TRX_ID               NUMBER(38),
+		TRX_CODE             VARCHAR2 (10),
+		TRX_DESC             VARCHAR2 (40),
+		TYPE                 CHAR (1),
+		DEFAULT_AMT          FLOAT(126),
+		ADD_INTERACT_CODE     VARCHAR2 (8),
+		CANCEL_INTERACT_CODE   VARCHAR2 (8),
+		USE_CASE_SHDES       VARCHAR2 (20)
+)
+TABLESPACE DATA
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             16M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING
+NOCACHE;
+
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.TRX_ID               IS 'ID du type de transaction';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.TRX_CODE             IS 'Code du type de transaction';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.TRX_DESC             IS 'Libellé du type de transaction';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.TYPE                 IS 'Sous type : A pour avance.';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.DEFAULT_AMT          IS 'Montant par défaut dans le cas des types d’avances prédéfinies';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.ADD_INTERACT_CODE    IS 'Code de l''interaction correspondant';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.CANCEL_INTERACT_CODE IS 'Code de l''interaction correspondant dans le cas d’annulation';
+COMMENT ON COLUMN FINANCE.TRANSACTION_TYPE.USE_CASE_SHDES       IS 'SHDES du type de transaction EB (Paiement de facture, Paiement d''avance, paiement de garantie …etc.)';
+
+ALTER TABLE FINANCE.TRANSACTION_TYPE ADD CONSTRAINT PK_TRX_ID PRIMARY KEY  (TRX_ID);
+
+CREATE OR REPLACE PUBLIC SYNONYM TRANSACTION_TYPE FOR FINANCE.TRANSACTION_TYPE;
+
+GRANT SELECT, UPDATE, DELETE, INSERT ON FINANCE.TRANSACTION_TYPE TO LIQUI_DML_ROLE;
