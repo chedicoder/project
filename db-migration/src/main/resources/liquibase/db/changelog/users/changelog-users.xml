@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+    <changeSet id="users-20260206001" author="chedi.ghribi">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_account"/>
+            </not>
+        </preConditions>
+        <comment>Create user table</comment>
+        <sqlFile path="./liquibase/db/changelog/users/20260206001-user-account-table-create.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+    <!-- <changeSet id="users-20260206002" author="chedi.ghribi">
+        <comment>alter user table</comment>
+        <sqlFile path="./liquibase/db/changelog/users/20260206002-user-account-table-alter.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet> -->
+</databaseChangeLog>

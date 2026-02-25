@@ -51,10 +51,10 @@
 		</dependency>
 
 		
-		
+		<!-- database adapter -->
 		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc11</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 		</dependency>
 		
 
@@ -87,13 +87,15 @@
 			<plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.6.1</version>
                 <executions>
                     <execution>
                         <phase>process-resources</phase>
                         <configuration>
                             <propertyFile>liquibase.properties</propertyFile>
                             <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+							<classpath>
+								<path>${project.build.outputDirectory}</path>
+							</classpath>
                         </configuration>
                         <goals>
                             <goal>update</goal>

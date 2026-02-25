@@ -1,5 +1,0 @@
-﻿DROP USER EFT CASCADE;
-
-
-
-

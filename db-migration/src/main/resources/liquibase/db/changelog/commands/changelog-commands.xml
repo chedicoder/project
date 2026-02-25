@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+    <changeSet id="commands-20260206001" author="chedi.ghribi">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="orders"/>
+            </not>
+        </preConditions>
+        <comment>Create command table</comment>
+        <sqlFile path="./liquibase/db/changelog/commands/20260206001-orders-table-create.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet>
+    <!-- <changeSet id="commands-20260206002" author="chedi.ghribi">
+        <comment>alter command table</comment>
+        <sqlFile path="./liquibase/db/changelog/commands/20260206001-orders-table-alter.sql" splitStatements="true" endDelimiter=";"/>
+    </changeSet> -->
+</databaseChangeLog>

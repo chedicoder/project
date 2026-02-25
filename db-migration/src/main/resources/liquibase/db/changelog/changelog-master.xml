@@ -4,14 +4,7 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
 
-    <include file="./liquibase/db/changelog/Eft/changelog-eft.xml" />
-    <include file="./liquibase/db/changelog/TaskManager/changelog-task-manager.xml" />
-    <include file="./liquibase/db/changelog/Notification/changelog-notification.xml" />
-    <include file="./liquibase/db/changelog/Mop/changelog-mop.xml" />
-    <include file="./liquibase/db/changelog/finance/changelog-finance.xml" />
-    <include file="./liquibase/db/changelog/Interface/changelog-interface.xml" />
-    <include file="./liquibase/db/changelog/Portability/changelog-portability.xml" />
-    <include file="./liquibase/db/changelog/event/changelog-event.xml" />
-
-
+    <include file="./liquibase/db/changelog/users/changelog-users.xml" />
+    <include file="./liquibase/db/changelog/commands/changelog-commands.xml" />
+    
 </databaseChangeLog>
